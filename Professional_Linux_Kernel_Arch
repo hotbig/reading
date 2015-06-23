@@ -9,5 +9,8 @@ CH15 时间管理
 - lenovo-R400 上面的HPET是14.318180mhz (dmesg|grep -i HPET)
   http://blog.csdn.net/sahusoft/article/details/7867069
 - clocksource, /sys/devices/system/clocksource/clocksource0/available_clocksources
-.RTC
-- 100hz, 1000hz, ----> 10ms, 1ms resolution timer
+.LAPIC
+- IA上，kernel 2.6.18之后启用代替PIT, 精度是1000ns,就是1微秒
+.PIT
+- IA上，100hz, 1000hz, ----> 10ms, 1ms resolution timer
+
