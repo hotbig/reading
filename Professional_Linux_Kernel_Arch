@@ -1,0 +1,10 @@
+CH15 时间管理
+-----------------------------------------------------------------------------------------------
+.HPET: 
+- at least 10Mhz frequency. 1GHZ = 1ns cycle, 10MHZ= 100ns cycles, 最高的精度就是100ns
+- provide 3~256 comparators to generate interrupts for when the least significant bits 
+  are equal to the corresponding bits of the 64-bit main counter value. Comparators can
+  be driven by the operating system, e.g. to provide one timer per CPU for scheduling, 
+  or by applications.
+- lenovo-R400 上面的HPET是14.318180mhz (dmesg|grep -i HPET)
+  http://blog.csdn.net/sahusoft/article/details/7867069
