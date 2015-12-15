@@ -1,0 +1,123 @@
+
+13 Architecture tactics and patterns
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+architecture pattern:
+
+structure pattern
+------------------------------------------------------------------------------------------
+layered pattern:
+module of the system may be independently developed and maintained
+to support modifiability, portability, and reuse
+1. upward usage is not allowed, this is the most important about layere pattern as it increasing the dependency of software.
+2. layer always adde performance penalty
+
+component & connector pattern
+------------------------------------------------------------------------------------------
+broker pattern
+it defines a runtime component that mediate the communication between a number of clients and servers.
+structure distributed software so that service users do not need to know the nature and location of services.
+make it easier to change the bindings between users and providers.
+
+disadvantage:
+1. complexity 
+2. latecy
+3. attack 
+4. single point failure
+5. bottleneck of communication
+
+model-view-controller(MVC)
+N/A
+
+filter and pipe 
+https://msdn.microsoft.com/en-us/library/dn568099.aspx
+N/A
+
+client and server 
+N/A
+
+peer to peer pattern
+N/A
+
+Service Oriented Architecture Pattern
+it's like broker pattern but more complex. support different platform and different language , legacy system. Order Processing Center.
+REST/SOAP
+
+publish subscribe pattern
+N/A
+
+
+allocation pattern
+------------------------------------------------------------------------------------------
+map/reduce pattern
+N/A
+
+multi-tiers pattern(the combination of c&c pattern and allocatio pattern )
+group similar component together and specify the computer env.
+Tiers are not component, but rather logical groupings of components. 
+also don't confused tiers with layers, layers is a type of module (static), tier is runtime entitys.
+
+
+=relation between tactics and pattern
+pattern comprise tactics 
+tactics augment pattern (a good example to explain this with broken pattern, with tactics (multi-copy...)
+
+
+13.4 using tactics together, show a example of using tactics.
+
+
+14 Quality attribute modeling and analysis
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+============
+quality attribute check list
+thought experiment and back to the envelope
+experiments/simulation/prototype
+...
+
+
+
+15 Architecture in Agile project
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+15.1 how much architecture
+10k LOC: time to up-front work is a waste of effort
+100k loc: 20%
+1000k loc: 40%
+anyway, it depends for how much time should spend on arthitecture in Agile. (large project need more)
+
+
+15.2 agility and architecture methods
+a.arch documenting
+----
+if information isn't needed, don't spend resource to document it.
+all documentation should have intended use and audience in mind.
+write for reader
+document the arch doc that:
+- need to teach newcomer
+- embody significant potential risks
+- we need change it frequently
+- convey to readers so they can do their job
+classic agile:
+emphasize documenting the minimum amount needed to let the current team of developer to make progress.
+
+b.arch evaluation
+----
+focus on the most important quality attribute and most risk part
+
+15.3 a brief example of agile architecture
+======
+The Web-Arrow team's emphasis on experimentation proved the key factor:
+it was our way of achieving an agile form of architecture conception, implementation 
+
+15.4 guidelines for the agile architecture
+======
+in software the equivalent of "purchasing something now" is quick and dirty implementation.
+such implementation frequently leaves technical debts that incurs penalties in the future,in terms of increased maintenance cost.
+when technical debts becomes unacceptedly high, project need to pay down some of this debg, in the form of refactoring, 
+which is key part of every agile architecture process.
+(xZP就欠了很多dept，没有记录，没有重构，后面难以维护，可以展开想想这个问题)
+
+what's our advice:
+- large system with relatively stable requirement: do large amount of up front design
+- large system without stable requirement: quickly design a architecture without many details, complete after experiment , after requirement clarified
+- small project, don't spend too much time on doc/up front design.
+
