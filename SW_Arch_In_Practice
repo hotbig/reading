@@ -121,3 +121,13 @@ what's our advice:
 - large system without stable requirement: quickly design a architecture without many details, complete after experiment , after requirement clarified
 - small project, don't spend too much time on doc/up front design.
 
+16 architecture and requirement
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+summary:
+architecture are driven by architecture significant requirement(ASR)
+how to gather ASR:
+- capature from requirement document
+- interview with stakeholder
+- host Quality Attribute Workshop
+
+use utility tree to organize ASR. The utility helps to capture these requirement in a structured form, startin from coarse to refined detailed scenarios.
