@@ -1,3 +1,160 @@
+1. what's software architecture
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+1.1 what software architecture is and what it isn't 
+the software architecture of a system is the set of structures needed to reason about the system, which-
+comprise software elements, relations among them and properties of both.
+- architecture is a set of softwae structures
+  - module structure(static)
+  - Ccmponent and connector(dynamic)
+  - allocation structure  
+- architecture is an abstraction 
+- architecture includes behavior
+
+system architecture: representation of a sysetm, functionality onto hw and sw ...
+enterprise architecture: about orgnization structure 
+
+1.2 architecture structures and views 
+- module structure
+  decomposition structure / Uses structure / layter structure / class structure / data model 
+- C&C Structure 
+  service structure / concurrency structure 
+- allocation structure 
+  deployment structure / implementation structure / work assignment structure 
+  
+1.4 what makes a good architectue
+  there is a checklist 
+
+2. why architecture is important 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+2.14 summary 
+there is a checklist of why.
+
+3. Architecture in different contexts 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+3.8 Summary 
+- technical: including the archievement of quality attribute requirements...
+- project life cycle: document/communciation/evaluate/agile ...
+- bussiness: satisfy the bussiness goal 
+- professional: duties 
+
+
+4. Understanding Quality Attributes 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+requirements from a system come in three categories
+- functional 
+- quality attribute 
+- constraints 
+
+5. Availability
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+5.2 availability tactics
+- detect faults
+  ping echo/monitor/heartbeat/timestamp/sanity checking/condition monitoring/voting/exception detection/self-test
+- recover from faults 
+  - preparation and repair 
+    active redundancy/ passive redundancy /spare /exception handling /rollback /SW upgrade /retry /ignore /degradation/ reconfiguration
+  - reintroduction
+    shadow / state resync / escalating restart / non-stop forwarding 
+- prevent faults 
+  removal from service / transactions / predictive model / exception prevention / increset competence set   
+5.3 checklist 
+  
+6 Interoperability
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+interoperability is about the degree to which two or more system can usefully exchange meaningful information
+via interfaces in a particular context. (SOAP simple object access protocol, REST representation state transfer)
+
+6.2 interoperability tactics
+- locate 
+  discover service
+- manage interface 
+  orchestrate
+  tailor interface 
+6.3 checklist 
+  
+7 Modifiability
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+7.2 modifiability tactics
+- reduce size of a module 
+  split module 
+- increase cohesion
+  increase semantic coherence
+- reduce coupling
+  encapsulate / use an intermidiary / restrict dependencies / refactor / abstract common services
+- defer binding 
+  build time/configration time/startup/runtime
+7.3 checklist 
+  
+8 Perforamance
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+8.2 performance tactics
+- Control Resource Demand
+  manage sampling rate/limit event response/prioritize overhead/bound execution time/increase resource efficiency
+- manage resource 
+  increase resources/introduce concurrecy/ maintain multicopy of computations/ maitain multicopy of data/
+  bound queue sizes/ schedule resources
+8.3 checklist 
+  
+9 security
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+9.2 tactics for security
+- detect attacks
+  detect intrustion/detect serveice denial/verify message inegrity/detect message delay
+- resist attacks
+  identify actors/authenticate actors/authorize actors/limit access/limit exposure/encrypt data/seperate entity
+- react to attack
+  revoke access/lock computer/inform actors
+- recover 
+  maintain audit trail/restore system
+9.3 checklist  
+
+10 testability
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+10.2 tactics for testability
+- Control and observe system states
+  - specialized interface 
+  - record and playback
+  - localize state storage
+  - abstract data source 
+  - sandbox
+  - executable assertions
+- limit complexity
+  - limit structural complexity
+  - limit nonderministic (限制非确定性)
+10.3 checklist 
+  
+11 usability
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+11.2 tactics
+- support use initiative
+  cancel/undo/pause/resume/aggregate
+- support system initiative 
+  maintain task model/user model/system model
+11.3 checklist 
+
+12 other quality attibute
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+12.1 other important quality attributes
+variability
+portability
+development distributability
+scalability
+deployability
+mobility
+monitorability
+safety
+
+12.4 Using standard quality list or not
+ISO/IEC FCD 25010: System and software quality model.
+- functional suitability
+- performance efficiency 
+- compatibility
+- usability
+- reliability
+- security
+- maintainability
+- portbility
+
 
 13 Architecture tactics and patterns
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -131,3 +288,175 @@ how to gather ASR:
 - host Quality Attribute Workshop
 
 use utility tree to organize ASR. The utility helps to capture these requirement in a structured form, startin from coarse to refined detailed scenarios.
+
+17 architecture and requirement
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+17.1 
+======
+three ideas are key to architecture design:
+- decomposition
+- designing to architecturally significant requirement
+- generate and test
+
+17.2
+ADD five steps:
+1. choose a element to design. for the green-field designs, the part to begin with is simply the entire system.
+   for designs that already partially completed(either by external or by previous iteration of ADD), the part 
+   is an element not ye designed. Choosing the next element can proceed in BFS, DFS or mixed
+2. identify the ASRs for the chosen element
+3. generate a solution for the chosen element, using design collateral such as exsiting system, frameworks,
+   pattern and tactics, and the design checklist from chapter 5-11
+4. verify and refine requirements and generate input for the next iteration.
+   - satisfy ASR, next iteration
+   - not sarisfy ASR, continue to generate and test
+   - find previous disign is inadequate, then backtrack to re-designed
+5. repeat 1-4 until all ASR satisifed.
+
+
+
+18 architecture and requirement
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+18.1 Uses and Audiences for Architecture Documentation
+a. architecture documentation serves as a means of education
+b. architecture documentation serves as a primary vehicle for communication among stakeholders
+c. as a basis for system analysis and construction.
+
+18.2 Notation for Architecture doc
+a. informal notations(ppt)
+b. UML
+c. ADL(Arch description language)
+
+18.3 Views (at least one a,b,c for one arch doc)
+a. module view 
+b. C&C view (component and connect)
+c. allocation view
+d. quality view(if certain quality attibute is extremely important)
+
+module view/c&c view/allocation view:functional requirement 
+quality view:quality attribute requirement
+
+
+18.4 Choosing views
+steps:
+1. build stakeholder/view table
+2. combine views 
+3. prioritize an stage
+
+18.6 Building the documentation package
+a. template for a view
+b. template for documentation beyond views.
+
+wiki: easy for overview, hard for find details
+word: find information can be easier.
+
+18.7 documenting behavior
+documenting an architecture requires behavior documentation that complements structure views 
+by describing how architecture elements interact with each other.
+a. use cases.
+b. UML sequence diagram
+c. communication diagram 
+d. UML activity diagram
+
+18.8 architecture documentation and quality attribute
+1. major design approach are put into chapter rationale
+2. quality attribute bounds are defined in interface document
+3. architecture documentation aften contains mapping to requirement
+
+18.9 documenting architecture that change fast
+1. document what is true about all version
+2. document the ways the architecture is allowed to change
+
+18.10 documenting architecture in a agile project
+if information isn't needed, don't document it.
+
+
+19 architecture, implementation and testing 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+19.1 architecture and implementation
+when update architecture after code drift away from arch doc:
+1. sync at life-cyle milestone(end of an release iteration, no schedule pressue)
+2. sync at crisis
+3. sync at check-in, when a change break the arch rules
+
+20. Reconstruction and comformance
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+all nontrivial long-lived system evolve: the code and the architecture both. 
+if the code evolves in an ad hoc manner, the results will be big mud.
+
+the only defense is consistent attention to architecture quality, 
+which implies the need to reconstruct architecture and conformance.
+
+21. Architecture Evaluation
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+21.1 Evaluation Factors
+a. evaluation by desginer 
+b. peer review
+c. oursider review.
+
+22.2 The Architecture Tradeoff Analysis Method(ATAM)
+no deep dive!!!!
+
+22.3 lightweight architecture evaluation(lightweight ATAM)
+use less time than ATAM. 
+
+
+
+22. Management and Governance
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+22.1 planning
+1. (up-down)the architecture team produces the initial architecture design and the release plans for the system, including:
+- what feaures will be release and when the releases will occur. 
+2. assign various piece(work breakdown structure) of project and build the development team.
+- at this point, every piece of project can be estimated from bottom-up 
+3. the differences between the top-down and bottom-up schedule need be re-discussed..again and again generate the schedule and release plan.
+
+22.2 Organizing
+a. software development team organization
+each member of the team that designed the software architecture becomes the lead for a team.
+in addition, many support function such as writing documentation, system testing, training, integration 
+quality assuarance should be done in matrix form. 
+
+b. division of responsibility between project manager and software architect.
+architect responsibility:
+project integration management: create, design, and organize team around design. Manage dependencies. implement the capture of the metrics. Mange request to change.
+project scope management: elicit, negotiate and review runtime requirement and generate development requirements. estimate cost, schedule and risks of meeting requiremnt
+project time management: help to define work breakdown. define tracking measures, recommend assignment of resources to SW team.
+project cost management: gather costs from individual teams. make recommendations regarding build/buy and resource allocation.
+project quality management: design for quality and track system against design, define code level quality metrics.
+project human resource management: define required technical skill sets. mentor developers about career paths. recommend training, interview candidate
+project communication management: ensure communication and coordination among developers, solicit feedback as to progress, problems and risks
+project risk management: identify and quantify risks, adjust architecture and processes to mitigate risk
+project procurement management: determine tools/hardware/technology/trainning  
+
+22.3 Implementing
+a. tradeoff
+the implemenation itself causes tradeoff between schedule, function and cost.
+Any change to the architecture will incur costs, and it's the architect's responsibility to be the gatekeeper 
+for such change	.
+
+b. incremental dev:
+three states for each release:
+- plan  20~40%
+- development 20~40%
+- test and repair 40%
+
+c. tracking 
+formal and informal communication
+status meeting, action point for open issue,  
+
+
+
+24. Architecture Competence 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+24.1 Competence of individuals: duties skills and knowledge of architects
+three ways to improve individual competence:
+1. gain experience carrying out duty. !!!!!!a very long but important list !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   - technical duties 
+   - non-tech duties 
+2. improve your nontechnical skills !!!!!!a very long but important list !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+3. master the body of knowledge !!!!!a very long but important list !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+24. Competence of a software architecture orgnization.
+here is some things--duties--that an organization can perform to help improve the success of it's architecture efforts.
+!!!!!a very long but important list !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
