@@ -1,0 +1,722 @@
+1 2 3 4 5 6 7 8 11 14 15 16 26 30.
+--------
+
+CH01 Introduction
+===============================================================================================
+
+.2 A Simple Daytime Client 
+-----------------------------------------------------------------------------------------------
+.2.1 bzero and memset，memset的参数容易用错
+.2.2 host byte order and network byte order 
+- host: little endian / big endian 
+  BE: MSB在低地址，LSB在高地址。 LE:与BE相反。
+- network: big endian, MSB first, LSB next 
+  (MSB和内存的存储无关，相对于人的阅读顺序来找MSB，例如对于0xABCDEFGH，byte 'A'所在的最高位就是MSB)
+  http://tools.ietf.org/html/rfc1700
+
+.2.3 TCP has no termination record markers. application should implement by itself. 
+  -\r\n, SMTP: \r\r\n 
+  
+.7 OSI Model
+-----------------------------------------------------------------------------------------------
+.7.1 difference of below two layer:
+(1) Transport Layer(TCP/UDP):
+	- connection oriented communication (tcp)
+	- same order delivery
+	- reliability 
+	- flow control 
+	- congestion control
+	- multiplexing
+(2) Networks Layer(IP): 
+    - connection model: connectionless communication
+	- host addressing: ip addressing
+	- message forwarding: gate and router in ip
+    -----------
+    |app  layer|        user   space 
+    ----------------------------------
+    |tr   layer|        kernel space 
+    -----------
+    |ne   layer|
+    -----------
+    |link layer|	
+    -----------
+
+.12 Summary
+-----------------------------------------------------------------------------------------------	
+The Single Unix Specification Version 3 is used in this text. called simply \The Posix Spec\.
+
+CH02 The Transport Layer: TCP, UDP and SCTP
+===============================================================================================
+.3 UDP
+-----------------------------------------------------------------------------------------------	
+- UDP can share the same socket for different delivery.
+- UDP datagram has a length(record boundary) which need be passed to the receiving application. 
+
+.4 TCP 
+-----------------------------------------------------------------------------------------------	
+- TCP can't provide 100% reliable protocol, it provides reliable delivery or reliable notification of failure
+- TCP contains algorithm to estimate RTT so that it knows how long it need to wait ACK.
+  LAN: 毫秒级 WAN: 秒级
+- TCP has sequence number for each segments.
+- TCP provides flow control which tell the peer how many bytes of data it's willing to hanle.
+  this is call \advertised window\.
+- TCP is full-duplex. 
+
+.6 TCP connection and termination 
+-----------------------------------------------------------------------------------------------	
+(1) TCP Connection
+- three handshake:
+  Client: SYNC (active open)
+  Server: SYNC, ACK (passive open)(combine the acknowledge and the sync in one packet)
+  Client:　ACK.
+- Each SYNC contains TCP three options: MSS, Window Scale Option and Time Stamp 
+(2) TCP termination
+- four steps to terminate a connection 
+  Client: FIN (active close)
+  Server: ACK (passive close)
+  Client: FIN
+  Server: ACK
+(3) TCP state transition diagram 
+- Those states are displayed by netstat. it's useful.
+
+(4) Choose UDP or TCP?
+TCP: more overheads involved while using TCP. (3 handshake/4 handshake, etc)
+it's important to understand that many application are build using UDP because the 
+application exchange small amounts of data and UDP avoids the overhead of TCP connection 
+establishment and connection termination. 
+
+.7 TCP TIME_WAIT state
+-----------------------------------------------------------------------------------------------	
+there is two reasons for the TIME_WAIT state:
+- To implement TCP's full-duplex connection reliably
+- To allow old duplicate segments to expire in the network.
+
+.9 Port Numbers 
+-----------------------------------------------------------------------------------------------	
+UDP and TCP can use same port number. (better be same for same service.)
+- the well known ports: 0~1023, need root \sudo\  to use those port 
+- the registered ports: 1024~49151,  
+- the dynamic ports: 49152~65535
+
+socket pair: 
+(local[ip+port]  + remote [ip+port])
+
+.10 TCP port number and concurrent server
+-----------------------------------------------------------------------------------------------	
+- 如果listening port and connected port use same port:
+  比如FTP服务器, 监听端口是21，有好几个client连上来时，这些链接都是用21端口接收数据
+  所以此时要用socket pair里面的remote ip和port来确定一个新的segement需要转发给那个子进程处理。
+- fork new child process for new connection for concurrent.
+
+.11 Buffer size and limitation.
+-----------------------------------------------------------------------------------------------	
+- Maximum IP datagram(IPv4): 65535, including ip header.
+- MTU: ethenet 1500, it's a datalink level limitation
+  path MTU: the shorted MTU in the routing path. 
+  if datagram exceeds path MTU, it need be fragmented.
+  
+- IP header has one DF(don't fragment) flag. 
+  如果一个数据包超过path MTU, 同时DF被置，那么会返回一个ICMP with stat "destination unreachable"
+
+(1) TCP output
+  TCP发送过程。可以再重点看看。特别注意，TCP有个send buffer。
+  - APP call write
+  - kernel copy all data into socket send buffer. (需要注意send buffer的数据会一直保留到ack回来整个传输完成)
+  - TCP send the data to IP after prepending TCP header to each segement
+  - IP prepend header and search routing table to send it to related datalink(有点想SrioTxLink这种)
+  
+(2) UDP output
+  没有TCP对应的send buffer，（当然也有把数据从user space拷贝到kernel space的过程。）
+  
+  
+CH03 Sockets Introduction
+===============================================================================================
+.2 Socket Address Structures
+-----------------------------------------------------------------------------------------------	
+- sockaddr 通用的结构，所有的函数都用这个定义，调用函数时都需要转换成这个。 为什么不用void*?因为这个比void*更早出现。
+- sockaddr_in: // ipv4
+	{ 
+	  uint8_t sin_len; s
+	  a_family_t sin_family; 
+	  in_port_t sin_port; 
+	  struct in_addr sin_addr;  //---> struct in_addr{in_addr_t s_addr;}
+	  //可以通过serv.sin_addr或者serv.sin_addr.s_addr访问，为了兼容老的代码等历史问题
+	  char sin_zero[8];
+	}
+- sockaddr_in6
+- sockaddr_un, unix socket 
+- sockaddr_storage, 最通用的结构。以上所有协议都可以用这个
+
+.3 value-result argument 
+-----------------------------------------------------------------------------------------------	
+下面代码addrlen就是value-result argument, 传进去一个值，返回的时候值可能已经变了。
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+	int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+	struct sockaddr_un cli; /* Unix domain */
+	socklen_t len;
+	
+	len = sizeof(cli); /* len is a value */
+	getpeername(unixfd, (SA *) &cli, &len);
+	/* len may have changed */	
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\  
+
+.5 Byte Manipulation Functions 
+-----------------------------------------------------------------------------------------------	
+BSD Derived:　bzero, bcopy, bcmp
+ANSI C: memset, memcpy, memset, 
+memcpy 和memmove区别： memmove可以处理memory overlapping的场景。memcpy更加快
+
+.7 inet_pton and inet_ntop
+-----------------------------------------------------------------------------------------------	
+n: numeric
+p: presentation
+
+这两个函数隐藏了协议相关部分，而上一节介绍的inet_aton等都需要指定协议相关参数。
+
+.9 readn and writen
+-----------------------------------------------------------------------------------------------	
+A read or write on a stream socket might input or output
+fewer bytes than requested, but this is not an error condition. The reason is that buffer
+limits might be reached for the socket in the kernel. All that is required to input or output
+the remaining bytes is for the caller to invoke the read or write function again. Some
+
+CH04 Sockets Introduction
+===============================================================================================
+.1 introduction 
+-----------------------------------------------------------------------------------------------	
+- concurrent model:
+  one-process-per-client
+  one-thread-per-client
+  
+.3 connect 
+-----------------------------------------------------------------------------------------------	
+different error return state of TCP connect:
+- timeout
+  a. no response to it's SYNC segment
+- reset:
+  a. SYN arrives for a port that has no listening server 
+  b. TCP want to abort an existing connection
+  c. TCP receives a connection that does not exist.
+- destination unreachable 
+  a. ICMP "destination unreachable" from some intermediate router
+  
+.5 listen 
+-----------------------------------------------------------------------------------------------	
+#int listen (int sockfd, int backlog); // backlog=5, then the incomplete queue+complete queu=1.5*5!!!!!
+
+the kernel maintains two queue for a given listening socket.
+- an incomplete connection queue. there sockets are in the SYNC_RCVD state;
+- a complete connection queue. these sockets are in the established state 
+
+When a SYN arrives from a client, TCP creates a new entry on the incomplete queue and
+then responds with the second segment of the three-way handshake: the server's SYN with
+an ACK of the client's SYN (Section 2.6). This entry will remain on the incomplete queue
+until the third segment of the three-way handshake arrives (the client's ACK of the server's
+SYN), or until the entry times out. (Berkeley-derived implementations have a timeout of 75
+seconds for these incomplete entries.) If the three-way handshake completes normally, the
+entry moves from the incomplete queue to the end of the completed queue. When the
+process calls accept, which we will describe in the next section, the first entry on the
+completed queue is returned to the process, or if the queue is empty, the process is put to
+sleep until an entry is placed onto the completed queue.
+
+- SYNC flooding attacker (DoS, Denial of Service)
+  send Sync at a high rate to the server.
+  
+.6 accept 
+-----------------------------------------------------------------------------------------------	
+listening socket
+connected socket
+
+.8 Concurrent Servers
+-----------------------------------------------------------------------------------------------	
+- Why doesn't the close of connfd by the parent terminate its connection with the client? 
+To understand what's happening, we must understand that every file or socket 
+has a reference count. The reference count is maintained in the file table entry 
+The actual cleanup and de-allocation of the socket does not happen until the reference count reaches 0.
+
+.9 close 
+-----------------------------------------------------------------------------------------------	
+- why need close the connected descriptor in parent?
+First, the parent will eventually
+run out of descriptors, as there is usually a limit to the number of descriptors that any
+process can have open at any time. But more importantly, none of the client connections
+will be terminated. When the child closes the connected socket, its reference count will go
+from 2 to 1 and it will remain at 1 since the parent never closes the connected socket.
+
+CH05 TCP Client and Server example
+===============================================================================================
+.3 TCP Echo Server: str_echo function
+-----------------------------------------------------------------------------------------------	
+If the client closes the connection (the normal scenario), the receipt of the client's FIN causes
+the child's read to return 0. This causes the str_echo function to return, which terminate the child.
+
+.5 TCP Echo Client: str_cli function 
+-----------------------------------------------------------------------------------------------	
+The loop terminates when fgets returns a null pointer, which occurs when it encounters either 
+an end-of-file (EOF) or an error. Our Fgets wrapper function checks for an error and aborts if one occurs,
+
+.6 Normal StartUp
+-----------------------------------------------------------------------------------------------	
+(1) client and server handshake while connecting 
+client: return from function connect after second segment received.(sync+ack)
+server: return from function accept after third segement received.(ack)
+
+(2) states after startup
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+linux % netstat -a
+Active Internet connections (servers and established) Proto Recv-Q Send-Q Local Address Foreign Address State
+tcp 0 0 local host:9877  localhost:42758 ESTABLISHED         !!!!!! Server Child connection 
+tcp 0 0 local host:42758 localhost:9877  ESTABLISHED         !!!!!! client connection 
+tcp 0 0 *:9877 *:*                       LISTEN              !!!!!! Server Parent on listening 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+.7 normal termination of tcp connection:
+-----------------------------------------------------------------------------------------------	
+a. Client: Ctrl+D(EOF), fgets return NULL, str_cli return to main, exit
+b. Client: Process termination is closing all opened descriptors. send FIN to server,  receive ACK from server and goto FIN_STATE_2
+c. Server: Server receive FIN, ack the client, block read and return from str_echo
+d. Server: Process termination is closing all opened descriptors. send FIN to client. 
+e. Client: Client ack the server and .....
+
+.9 Handling SIGCHLD signal
+-----------------------------------------------------------------------------------------------	
+(1) about zombies
+The purpose of the zombie state is to maintain information about the child for the parent to
+fetch at some later time. 
+
+whenever fork child, we must wait for them to prevent them for becoming zombies.
+
+(2) about block system call
+The basic rule that applies here is that when a process is blocked in a slow system call and
+the process catches a signal and the signal handler returns, the system call can return an
+error of EINTR. 
+we must be prepared for slow system calls to return EINTR.
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+for ( ; ; ) {
+	clilen = sizeof (cliaddr);
+	if ( (connfd = accept (listenfd, (SA *) &cliaddr, &clilen)) < 0) {
+	if (errno == EINTR)
+		continue; /* back to for () */
+	else
+		err_sys ("accept error");
+}
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+.10 wait and waitpid
+-----------------------------------------------------------------------------------------------	
+use waitpid to avoid the zombies with multi-child.
+
+.11 .12 .13 .14 .15 .16
+-----------------------------------------------------------------------------------------------	
+typical exceptional scenarios of TCP connection. worth to read!!!!!!!!!!!!!!!!!!!!
+
+.18 Data Format
+-----------------------------------------------------------------------------------------------	
+please read and thing exercise 5.8 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+CH06 I/O Multiplexing: The select and poll Functions
+===============================================================================================
+.2 I/O Models
+-----------------------------------------------------------------------------------------------	
+There are five different models for I/O provided by Unix:
+ Blocking
+ Nonblocking
+ I/O multiplexing
+ Signal-driven I/O
+ Asynchronous I/O
+
+.3 Select
+-----------------------------------------------------------------------------------------------	
+The most commonly used function for I/O multiplexing is select. We tell the select
+function what descriptors we are interested in (for reading, writing, and exceptions), the
+maximum amount of time to wait, and the maximum descriptor number (plus one)
+
+Exercises 6.2
+
+.6 Shutdown
+-----------------------------------------------------------------------------------------------	
+We used our echo client in a batch mode using select and discovered that even though
+the end of the user input is encountered, data can still be in the pipe to or from the server.
+To handle this scenario requires the shutdown function, and it lets us take advantage of
+TCP's half-close feature.
+
+.7 pselect
+-----------------------------------------------------------------------------------------------	
+different between select and pselect:
+(1)The difference in these two structures is with the second member: The tv_nsec
+member of the newer structure specifies nanoseconds, whereas the tv_usec
+member of the older structure specifies microseconds.
+(2)pselect adds a sixth argument: a pointer to a signal mask. This allows the program
+to disable the delivery of certain signals, test some global variables that are set by
+the handlers for these now-disabled signals, and then call pselect, telling it to reset
+the signal mask.
+
+.10 poll
+-----------------------------------------------------------------------------------------------	
+difference between poll and select
+http://stackoverflow.com/questions/970979/what-are-the-differences-between-poll-and-select
+
+
+CH07 Socket Options
+===============================================================================================
+.1 Introduction
+-----------------------------------------------------------------------------------------------	
+There are various ways to get and set the options that affect a socket:
+ The getsockopt and setsockopt functions
+ The fcntl function
+ The ioctl function
+
+.5 Generic Socket Options
+-----------------------------------------------------------------------------------------------	
+The most commonly used options that we might encounter are
+SO_KEEPALIVE, SO_RCVBUF, SO_SNDBUF, and SO_REUSEADDR
+
+The SO_KEEPALIVE socket option is set by many TCP servers and automatically terminates a
+half-open connection
+
+The SO_LINGER socket option gives us more control over when close returns and also lets
+us force an RST to be sent instead of TCP's four-packet connection termination sequence
+
+
+CH08 UDP
+===============================================================================================
+Next, this function provides an iterative server, not a concurrent server as we had with
+TCP. There is no call to fork, so a single server process handles any and all clients. In
+general, most TCP servers are concurrent and most UDP servers are iterative.
+
+.6 UDP Echo Client: dg_cli Function
+-----------------------------------------------------------------------------------------------	
+how to avoid below risk?
+//////////////////////////////////
+	n = Recvfrom(sockfd, recvline, MAXLINE, 0, NULL, NULL); // receive any datagram from any process!!!!!!
+//////////////////////////////////
+solution---- specify receive address and compre it. if not, then discard it.
+
+
+.7 Lost Datagrams
+-----------------------------------------------------------------------------------------------	
+If a client datagram is lost (say it is discarded by some router between the client and server), 
+the client will block forever in its call to recvfrom in the function dg_cli, waiting for a server 
+reply that will never arrive. 
+(1) set a timeout. 
+//////////////////////////////////
+	11 alarm(5);
+	12 if ( (n = recvfrom(sockfd, recvline, MAXLINE, 0, NULL, NULL)) < 0) {
+	13 if (errno == EINTR)
+	14 fprintf(stderr, "socket timeout\n");
+	15 else
+//////////////////////////////////	
+(2) retransmission and sequence number.
+
+
+.9 Server Not Running
+-----------------------------------------------------------------------------------------------	
+ICMP error can't return to Application process. how can app know there is ICMP error?
+(1) use a connect UDP socket.
+(2) CH28 provide a solution with RAW socket .
+
+
+.11 connect Function with UDP
+-----------------------------------------------------------------------------------------------	
+(1)With a connected UDP socket, three things change
+a. We can no longer specify the destination IP address and port for an output
+operation. That is, we do not use sendto, but write or send instead. Anything
+written to a connected UDP socket is automatically sent to the protocol address
+(e.g., IP address and port) specified by connect.
+
+b. We do not need to use recvfrom to learn the sender of a datagram, but read, recv,
+or recvmsg instead. 
+
+c. Asynchronous errors are returned to the process for connected UDP sockets.
+
+(2) A process with a connected UDP socket can call connect again for that socket for one of two
+reasons:
+ To specify a new IP address and port
+ To unconnect the socket
+
+(3) When the application knows it will be sending multiple datagrams to the same peer, it is
+more efficient to connect the socket explicitly. 
+
+.13 Lack of Flow Control with UDP
+-----------------------------------------------------------------------------------------------	
+在我thinkpad r400上面，client端需要连续发送200000包*1400byte的报文才能使UDP丢包。
+
+.15 TCP and UDP Echo Server Using select
+-----------------------------------------------------------------------------------------------	
+A UDP socket is also created and bound to the same port. Even though the same
+port is used for TCP and UDP sockets, there is no need to set the SO_REUSEADDR socket
+option before this call to bind, because TCP ports are independent of UDP ports.
+
+
+
+CH11 
+===============================================================================================
+.18 Re-entrant Functions
+-----------------------------------------------------------------------------------------------	
+(1)In looking at these two problems with regard to signal handlers, one solution to the
+problem with gethostbyname (returning a pointer to a static variable) is to not call
+nonre-entrant functions from a signal handler. 
+
+(2)The problem with errno (a single global variable that can be changed by the signal handler) 
+can be avoided by coding the signal handler to save and restore the value of errno in the 
+signal handler as follows:
+///////////////////////////////////
+	void
+	sig_alrm(int signo)
+	{
+	int errno_save;
+	errno_save = errno; /* save its value on entry *
+	if (write( ... ) != nbytes)
+	fprintf (stderr, "write error, errno = %d\n", errno);
+	errno = errno_save; /* restore its value on return */
+	}
+///////////////////////////////////
+
+In this example code, we also call fprintf, a standard I/O function, from the signal
+handler. This is yet another re-entrancy problem because many versions of the standard
+I/O library are nonre-entrant: Standard I/O functions should not be called from signal
+handlers.
+
+
+in linux, errno is thread safe. On Linux, the global errno variable is thread-specific. POSIX requires that errno be threadsafe.
+
+
+.21 Summary
+-----------------------------------------------------------------------------------------------	
+The set of functions that an application calls to convert a hostname into an IP address and
+vice versa is called the resolver. The two functions gethostbyname and gethostbyaddr are
+the historical entry points. With the move to IPv6 and threaded programming models, the
+getaddrinfo and getnameinfo functions are more useful, with the ability to resolve IPv6
+addresses and their thread-safe calling conventions.
+
+The commonly used function dealing with service names and port numbers is
+getservbyname, which takes a service name and returns a structure containing the port
+number.
+
+CH13 Daemon Processes and the inetd Superserver
+===============================================================================================
+.7 Summary
+-----------------------------------------------------------------------------------------------	
+Daemons are processes that run in the background independent of control from all
+terminals. Many network servers run as daemons. All output from a daemon is normally
+sent to the syslogd daemon by calling the syslog function. The administrator then has
+complete control over what happens to these messages, based on the daemon that sent
+the message and the severity of the message.
+
+To start an arbitrary program and have it run as a daemon requires a few steps: Call fork
+to run in the background, call setsid to create a new POSIX session and become the
+session leader, fork again to avoid obtaining a new controlling terminal, change the
+working directory and the file mode creation mask, and close all unneeded files. Our
+daemon_init function handles all these details.
+
+Many Unix servers are started by the inetd daemon. It handles all the required
+daemonization steps, and when the actual server is started, the socket is open on standard
+input, standard output, and standard error. This lets us omit calls to socket, bind, listen,
+and accept, since all these steps are handled by inetd.
+
+CH14 Advanced I/O Functions
+===============================================================================================
+.9 Advanced Polling
+-----------------------------------------------------------------------------------------------	
+(1) dev/poll
+select每次返回后都需要重新设置FD SET，dev/poll不用每次都设置
+
+(2) kqueue
+相比select提供了更多的事件通知，比较进程被kill等
+Events include file I/O and timeouts like select, but also adds asynchronous I/O, file
+modification notification (e.g., notification when a file is removed or modified), process
+tracking (e.g., notification when a given process exits or calls fork), and signal handling.
+
+.10 summary
+-----------------------------------------------------------------------------------------------	
+（1）There are three main ways to set a time limit on a socket operation:
+ Use the alarm function and the SIGALRM signal
+ Use the time limit that is provided by select
+ Use the newer SO_RCVTIMEO and SO_SNDTIMEO socket options
+
+(2) recv、send相关的接口
+recvmsg and sendmsg are the most general of the five groups of I/O functions provided.
+They combine the ability to specify an MSG_xxx flag (from recv and send), plus employ the
+ability to return or specify the peer's protocol address (from recvfrom and sendto), with
+the ability to use multiple buffers (from readv and writev), along with two new features:
+returning flags to the application and receiving or sending ancillary data.
+
+（3） C标准库的Stand IO 也可以操作socket，不过不推荐。Stand IO有自己的send/receive buffer，使用的时候可能会出问题。
+
+CH15 Unix Domain Protocols
+===============================================================================================
+.3 socketpair
+-----------------------------------------------------------------------------------------------	
+int socketpair(int family, int type, int protocol, int sockfd[2]);
+family=AF_LOCAL
+protocol=0
+This function is similar to the Unix pipe function: Two descriptors are returned, and each
+descriptor is connected to the other.
+
+.5 Unix Domain Stream Client/Server
+-----------------------------------------------------------------------------------------------	
+11 Unlike our UDP client, when using the Unix domain datagram protocol, we must
+explicitly bind a pathname to our socket so that the server has a pathname to which it can
+send its reply. 
+
+.7 Pass descriptor by Unix Socket Domain.
+-----------------------------------------------------------------------------------------------	
+Current Unix systems provide a way to pass any open descriptor from one process to any
+other process. That is, there is no need for the processes to be related, such as a parent
+and its child. The technique requires us to first establish a Unix domain socket between the
+two processes and then use sendmsg to send a special message across the Unix domain
+socket. This message is handled specially by the kernel, passing the open descriptor from
+the sender to the receiver
+(两个进程共享的desc number可能不同。)
+
+CH16 Nonblocking I/O
+===============================================================================================
+.7 Summary 
+-----------------------------------------------------------------------------------------------	
+This version of our client is the fastest version that we show, although the code
+modifications are nontrivial. We then showed that it is simpler to divide the client into two
+pieces using fork;
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+10 val = Fcntl(sockfd, F_GETFL, 0);
+11 Fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
+12 val = Fcntl(STDIN_FILENO, F_GETFL, 0);
+13 Fcntl(STDIN_FILENO, F_SETFL, val | O_NONBLOCK);
+14 val = Fcntl(STDOUT_FILENO, F_GETFL, 0);
+15 Fcntl(STDOUT_FILENO, F_SETFL, val | O_NONBLOCK);
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+performance compare
+********************
+ 354.0 sec, stop-and-wait (Figure 5.5)
+ 12.3 sec, select and blocking I/O (Figure 6.13)
+ 6.9 sec, nonblocking I/O (Figure 16.3)
+ 8.7 sec, fork (Figure 16.10)
+ 8.5 sec, threaded version (Figure 26.2)
+********************
+
+We used nonblocking connects to develop a new client, which is similar to a Web client that opens multiple TCP
+connections at the same time to reduce the clock time required to fetch numerous files
+from a server. Initiating multiple connections like this can reduce the clock time, but is
+also "network-unfriendly" with regard to TCP's congestion avoidance.
+
+CH17 ioctl Operations
+===============================================================================================
+The ioctl commands that are used in network programs can be divided into six
+categories:
+ Socket operations (Are we at the out-of-band mark?)
+ File operations (set or clear the nonblocking flag)
+ Interface operations (return interface list, obtain broadcast address)
+ ARP table operations (create, modify, get, delete)
+ Routing table operations (add or delete)
+ STREAMS system (Chapter 31)
+
+CH22. Advanced UDP Sockets
+===============================================================================================
+.2 Receiving Flags, Destination IP Address, and Interface Index
+There are applications that want to know the destination IP address and the received
+interface for a UDP datagram. The IP_RECVDSTADDR and IP_RECVIF socket options can be
+enabled to return this information as ancillary data with each datagram.
+
+.4 When to Use UDP Instead of TCP
+UDP must be used for broadcasting or multicasting. UDP can be used for simple
+request-reply scenarios, but some form of reliability must then be added to the application.
+UDP should not be used for bulk data transfer.
+
+为什么UDP不能用来传输大数据快？
+UDP should not be used for bulk data transfer (e.g., file transfer). The reason is that
+windowed flow control, congestion avoidance, and slow-start must all be built into
+the application, along with the features from the previous bullet point, which means
+we are reinventing TCP within the application. We should let the vendors focus on
+better TCP performance and concentrate our efforts on the application itself.
+
+
+CH25. Signal-Driven I/O
+===============================================================================================
+信号驱动I/O
+When using signal-driven I/O, the kernel notifies us with a signal when something happens
+on a descriptor. 
+To use signal-driven I/O with a socket (SIGIO) requires the process to perform the
+following three steps:
+1. A signal handler must be established for the SIGIO signal.
+
+异步IO
+POSIX provides true asynchronous I/O with its aio_XXX functions. These functions let the
+process specify whether or not a signal is generated when the I/O completes, and which
+signal to generate.
+
+非阻塞IO (CH16 nonblocking I/O )
+With nonblocking I/O, the kernel does not return after initiating the I/O operation; the kernel
+returns immediately only if the operation cannot be completed without putting the process
+to sleep.
+
+
+A thread is either joinable (the default) or detached. When a joinable thread terminates, its
+thread ID and exit status are retained until another thread calls pthread_join. But a
+detached thread is like a daemon process: When it terminates, all its resources are
+released and we cannot wait for it to terminate. If one thread needs to know when another
+thread terminates, it is best to leave the thread as joinable
+
+
+CH27. Thread
+===============================================================================================
+.2 Basic Thread Functions: Creation and Termination
+-----------------------------------------------------------------------------------------------	
+a. pthread_create
+pthread_xxxxx function don't set the errno
+
+b. pthread_join
+We can wait for a given thread to terminate by calling pthread_join. Comparing threads to
+Unix processes, pthread_create is similar to fork, and pthread_join is similar to waitpi
+
+c. pthread_self
+d. pthread_exit
+
+.5 Thread-Specific Data
+-----------------------------------------------------------------------------------------------	
+a. pthread_once
+b. pthread_key_create
+c. pthread_getspecific
+d. pthread_setspecific
+
+.7 Mutexes: Mutual Exclusion
+-----------------------------------------------------------------------------------------------	
+a. pthread_mutex_lock
+b. pthread_mutex_unlock
+
+.8 Condition Variables
+-----------------------------------------------------------------------------------------------	
+#include <pthread.h>
+int pthread_cond_wait(pthread_cond_t *cptr, pthread_mutex_t *mptr);
+int pthread_cond_signal(pthread_cond_t *cptr);
+
+CH30. Client/Server Design Alternatives
+===============================================================================================
+.8 Thread lock can be applied between multi-process;
+changes is our three locking functions. To use thread locking between different processes requires that: 
+(i) the mutex variable must be stored in memory that is shared between all the processes; and 
+(ii) the thread library must be told that the mutex is shared among different processes.
+
+.12 summary
+(1) Creating a pool of children or a pool of threads reduces the process control CPU time
+compared to the traditional one-fork-per-client design by a factor of 10 or more.
+The coding is not complicated, but what is required, above and beyond the
+examples that we have shown, is monitoring the number of free children and
+increasing or decreasing this number as the number of clients being served changes
+dynamically.
+(2) Some implementations allow multiple children or threads to block in a call to accept
+, while on other implementations, we must place some type of lock around the call
+to accept. Either file locking or Pthread mutex locking can be used.
+(3) Having all the children or threads call accept is normally simpler and faster than
+having the main thread call accept and then pass the descriptor to the child or
+thread.
+(4) Having all the children or threads block in a call to accept is preferable over
+blocking in a call to select because of the potential for select collisions.
+(5) Using threads is normally faster than using processes. But, the choice of
+one-child-per-client or one-thread-per-client depends on what the OS provides and
+can also depend on what other programs, if any, are invoked to service each client.
+For example, if the server that accepts the client's connection calls fork and exec,
+it can be faster to fork a single threaded process than to fork a multithreaded
+process.
