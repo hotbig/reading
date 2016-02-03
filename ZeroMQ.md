@@ -11,12 +11,12 @@ Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写�
 所以对于MQ Client对象的class类型可以定义成为下面这样的格式：  
 ```
   struct _mdcli_t {
-  zctx_t *ctx; // Our context
-  char *broker;
-  void *client; // Socket to broker
-  int verbose; // Print activity to stdout
-  int timeout; // Request timeout
-  int retries; // Request retries
+    zctx_t *ctx; // Our context
+    char *broker;
+    void *client; // Socket to broker
+    int verbose; // Print activity to stdout
+    int timeout; // Request timeout
+    int retries; // Request retries
   };
 ```
 接着定义这个class对应构造和析构方法用来construct、destruct对象，以及用来接收消息和发送消息的send方法等  
