@@ -7,6 +7,7 @@ Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写�
 * 一个zmq socket属性  
 * 用于的verbose属性  
 * 和保证可靠性的timeout/和retry属性  
+
 所以对于MQ Client对象的class类型可以定义成为下面这样的格式：  
 ```
   struct _mdcli_t {
@@ -27,5 +28,5 @@ Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写�
   void mdcli_set_retries (mdcli_t *self, int retries)  
   zmsg_t *mdcli_send (mdcli_t *self, char *service, zmsg_t **request_p)
 ```
-**从第四章的开始，作者从面向过程的例子写到此处面向对象的例子，很妙！**
+**从第四章的开始，作者从面向过程的例子写到此处进化成面向对象的例子，很妙！**
 
