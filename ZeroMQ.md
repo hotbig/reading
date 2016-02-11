@@ -1,5 +1,6 @@
 ###CH01 Basics
-这章最重要的一点是大概描述了ZeroMQ有哪些特性，这些特性是使用ZeroMQ的理由： 
+这章最重要的一点是大概描述了ZeroMQ有哪些特性，这些特性是使用ZeroMQ的理由：   
+```
 And this is ØMQ: an efficient, embeddable library that solves most of the problems an
 application needs to become nicely elastic across a network, without much cost.
 Specifically:  
@@ -37,7 +38,7 @@ less power, and you can keep your old boxes in use for longer. Al Gore would lov
 Actually, ØMQ does rather more than this. It has a subversive effect on how you develop
 network-capable applications. Superficially, it’s a socket-inspired API on which you do
 zmq_msg_recv() and zmq_msg_send().
-
+```
 ###CH04 Reliable Request-Reply Pattern
 ---
 Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写面向对象的例子。  
