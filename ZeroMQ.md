@@ -1,10 +1,16 @@
 ###CH01 Basics
+---
 这章最重要的一点是大概描述了ZeroMQ有哪些特性，这些特性是使用ZeroMQ的理由：   
 ```
-And this is ØMQ: an efficient, embeddable library that solves most of the problems an application needs to become nicely elastic across a network, without much cost.
+And this is ØMQ: an efficient, embeddable library that solves most of the problems an 
+application needs to become nicely elastic across a network, without much cost.
 Specifically:  
-* It handles I/O asynchronously, in background threads. These communicate with application threads using lock-free data structures, so concurrent ØMQ applications need no locks, semaphores, or other wait states.  
-* Components can come and go dynamically, and ØMQ will automatically reconnect. This means you can start components in any order. You can create “service-oriented architectures” (SOAs) where services can join and leave the network at any time.  
+* It handles I/O asynchronously, in background threads. These communicate with application
+threads using lock-free data structures, so concurrent ØMQ applications need no locks, 
+semaphores, or other wait states.  
+* Components can come and go dynamically, and ØMQ will automatically reconnect. This means
+you can start components in any order. You can create “service-oriented architectures” 
+(SOAs) where services can join and leave the network at any time.  
 * It queues messages automatically when needed. It does this intelligently, pushing
 messages as close as possible to the receiver before queuing them.  
 * It has ways of dealing with over-full queues (called the “high-water mark”). When
