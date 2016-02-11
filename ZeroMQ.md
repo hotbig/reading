@@ -38,7 +38,43 @@ less power, and you can keep your old boxes in use for longer. Al Gore would lov
 ØMQ.
 Actually, ØMQ does rather more than this. It has a subversive effect on how you develop
 network-capable applications. Superficially, it’s a socket-inspired API on which you do
-zmq_msg_recv() and zmq_msg_send().
+zmq_msg_recv() and zmq_msg_send().  
+
+
+###CH02 Sockets and Patterns
+---
+这章的内容也是ZeroMq最核心的内容。讲了ZMQ Socket API和展现核心设计思想Message Pattern。  
+Like a favorite dish, ØMQ sockets are easy to digest. These sockets have a life in four
+parts, just like BSD sockets:  
+* We can create and destroy them, which go together to form a karmic circle of socket
+life (see zmq_socket(), zmq_close()).  
+* We can configure them by setting options on them and checking them if necessary
+(see zmq_setsockopt(), zmq_getsockopt()).  
+* We can plug them into the network topology by creating ØMQ connections to and
+from them (see zmq_bind(), zmq_connect()).  
+* We can use them to carry data by writing and receiving messages on them (see
+zmq_msg_send(), zmq_msg_recv()).  
+
+最核心的几个Message Pattern：  
+The built-in core ØMQ patterns are:  
+* Request-reply, which connects a set of clients to a set of services. This is a remote
+procedure call and task distribution pattern.  
+* Publish-subscribe, which connects a set of publishers to a set of subscribers. This is
+a data distribution pattern.  
+* Pipeline, which connects nodes in a fan-out/fan-in pattern that can have multiple
+steps and loops. This is a parallel task distribution and collection pattern.  
+
+These are the socket combinations that are valid for a connect-bind pair (either side can bind):  
+* PUB and SUB  
+* REQ and REP  
+* REQ and ROUTER  
+* DEALER and REP  
+* DEALER and ROUTER  
+* DEALER and DEALER  
+* ROUTER and ROUTER  
+* PUSH and PULL  
+* PAIR and PAIR  
+
 
 ###CH04 Reliable Request-Reply Pattern
 ---
