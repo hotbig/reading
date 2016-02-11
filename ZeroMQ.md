@@ -163,10 +163,10 @@ and that’s where everyone went.”
 ```
 ###CH07 Advanced Architecture Using ØMQ
 ---
-FileMQ，下面是如果完成这个application的五个步骤，这就是软件的演进最终形成架构！
-We can turn this into five real steps:
-1. Internalize the ØMQ semantics.
-2. Draw a rough architecture.
-3. Decide on the contracts.
-4. Make a minimal end-to-end solution.
-5. Solve one problem and repeat.
+FileMQ，下面是如果完成这个application的五个步骤，这就是软件的演进最终形成架构！  
+We can turn this into five real steps:  
+1. Internalize the ØMQ semantics.  
+2. Draw a rough architecture.  
+3. Decide on the contracts.  
+4. Make a minimal end-to-end solution.  
+5. Solve one problem and repeat.  
