@@ -89,6 +89,15 @@ These are the socket combinations that are valid for a connect-bind pair (either
 
 ###CH04 Reliable Request-Reply Pattern
 ---
+一些介绍到的reliable pattern:  
+* The Lazy Pirate pattern: reliable request-reply from the client side  
+* The Simple Pirate pattern: reliable request-reply using load balancing  
+* The Paranoid Pirate pattern: reliable request-reply with heartbeating  
+* The Majordomo pattern: service-oriented reliable queuing，还讲到了如何建立contract。  
+* The Titanic pattern: disk-based/disconnected reliable queuing，不错的一个pattern。
+* The Binary Star pattern: primary backup server failover  
+* The Freelance pattern: brokerless reliable request-reply  
+
 Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写面向对象的例子。  
 比如对于一个MD的client来说，他需要有：  
 * 一个zmq的context属性  
@@ -119,3 +128,45 @@ Service-Oriented Reliable Queuing (Majordomo Pattern)部分很好的用C来写�
 ```
 **从第四章的开始，作者从面向过程的例子写到此处进化成面向对象的例子，很妙！**
 
+###CH05 Adanced Publish-Subscrible Patterns
+---
+没有细看
+
+###CH06 The ZeroMQ Community
+---
+这一章内容其实不错。其中有个关于innovation的例子特别生动：
+```
+Two old engineers were talking of their lives and boasting of their greatest projects. One
+of the engineers explained how he had designed one of the greatest bridges ever made.
+“We built it across a river gorge,” he told his friend. “It was wide and deep. We spent two
+years studying the land and choosing designs and materials. We hired the best engineers
+and spent another five years designing the bridge. We contracted the largest engineering
+firms to build the structures, the towers, the tollbooths, and the roads that would connect
+the bridge to the main highways. Dozens died during the construction. Under the road
+level we had trains, and a special path for cyclists. That bridge represented years of my
+life.”  
+The second man reflected for a while, then spoke. “One evening me and a friend got
+drunk on vodka, and we threw a rope across a gorge,” he said. “Just a rope, tied to two
+trees. There were two villages, one at each side. At first, people pulled packages across
+that rope with a pulley and string. Then someone threw a second rope, and built a foot
+walk. It was dangerous, but the kids loved it. A group of men then rebuilt that, made it
+solid, and women started to cross, every day, with their produce. A market grew up on
+one side of the bridge, and slowly that became a large town, since there was a lot of space
+for houses. The rope bridge got replaced with a wooden bridge, to allow horses and
+carts to cross. Then the town built a real stone bridge, with metal beams. Later, they
+replaced the stone part with steel, and today there’s a suspension bridge standing in that
+same spot.”  
+The first engineer was silent. “Funny thing,” he said, “my bridge was demolished about
+10 years after we built it. Turns out it was built in the wrong place and no one wanted
+to use it. Some guys had thrown a rope across the gorge, a few miles further downstream,
+and that’s where everyone went.”  
+```
+###CH07 Advanced Architecture Using ØMQ
+---
+FileMQ，下面是如果完成这个application的五个步骤，这就是软件的演进最终形成架构！
+We can turn this into five real steps:
+1. Internalize the ØMQ semantics.
+2. Draw a rough architecture.
+3. Decide on the contracts.
+4. Make a minimal end-to-end solution.
+5. Solve one problem and repeat.
