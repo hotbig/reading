@@ -55,8 +55,7 @@ from them (see zmq_bind(), zmq_connect()).
 * We can use them to carry data by writing and receiving messages on them (see
 zmq_msg_send(), zmq_msg_recv()).  
 
-最核心的几个Message Pattern：  
-The built-in core ØMQ patterns are:  
+下面这几个是ZeroMQ最核心的几个Message Pattern：  
 * Request-reply, which connects a set of clients to a set of services. This is a remote
 procedure call and task distribution pattern.  
 * Publish-subscribe, which connects a set of publishers to a set of subscribers. This is
@@ -64,6 +63,7 @@ a data distribution pattern.
 * Pipeline, which connects nodes in a fan-out/fan-in pattern that can have multiple
 steps and loops. This is a parallel task distribution and collection pattern.  
 
+以及另外的一些组合：
 These are the socket combinations that are valid for a connect-bind pair (either side can bind):  
 * PUB and SUB  
 * REQ and REP  
@@ -75,6 +75,17 @@ These are the socket combinations that are valid for a connect-bind pair (either
 * PUSH and PULL  
 * PAIR and PAIR  
 
+###CH03 Advanced Request-Reply Pattern
+---
+这一章继续讲REQ-REP模式的高级topic，除了如何封装数据帧，如果组合这些不同额pattern，最重要的是几个example。
+* How the request-reply mechanisms work
+* How to combine REQ, REP, DEALER, and ROUTER sockets
+* How ROUTER sockets work, in detail
+* The load-balancing pattern
+* Building a simple load-balancing message broker
+* Designing a high-level API for ØMQ
+* Building an asynchronous request-reply server
+* A detailed inter-broker routing example，**如何从一个cluster扩展到多个cluster（cloud），非常好的一个例子**
 
 ###CH04 Reliable Request-Reply Pattern
 ---
